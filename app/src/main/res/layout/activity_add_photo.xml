@@ -38,7 +38,6 @@
         android:layout_width="match_parent">
         <EditText
             android:gravity="top"
-            android:background="#000000"
             android:id="@+id/addphoto_edit_explain"
             android:layout_width="match_parent"
             android:layout_height="100dp"

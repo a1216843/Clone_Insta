@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.clone_insta.R
+import com.example.clone_insta.databinding.ActivityAddPhotoBinding
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.android.synthetic.main.activity_add_photo.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,9 +16,10 @@ class AddPhotoActivity : AppCompatActivity() {
     var PICK_IMAGE_FROM_ALBUM = 0
     var storage : FirebaseStorage? = null
     var photoUri : Uri? = null
+    val binding by lazy { ActivityAddPhotoBinding.inflate(layoutInflater) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_photo)
+        setContentView(binding.root)
 
         // storage 객체 초기화
         storage = FirebaseStorage.getInstance()
@@ -27,7 +28,7 @@ class AddPhotoActivity : AppCompatActivity() {
         photoPickerIntent.type = "image/*"
         startActivityForResult(photoPickerIntent, PICK_IMAGE_FROM_ALBUM)
 
-        addphoto_btn_upload.setOnClickListener {
+        binding.addphotoBtnUpload.setOnClickListener {
             contentUpload()
         }
     }
@@ -37,7 +38,7 @@ class AddPhotoActivity : AppCompatActivity() {
         if(requestCode == PICK_IMAGE_FROM_ALBUM){
             if(resultCode == Activity.RESULT_OK){
                 photoUri = data?.data
-                addphoto_image.setImageURI(photoUri)
+                binding.addphotoImage.setImageURI(photoUri)
             }
             else{
                 finish()

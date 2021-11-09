@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import com.example.clone_insta.databinding.ActivityLoginBinding
+import com.example.clone_insta.databinding.ActivityMainBinding
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -20,7 +22,6 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.android.synthetic.main.activity_login.*
 import java.util.*
 
 
@@ -29,20 +30,22 @@ class LoginActivity : AppCompatActivity() {
     var googleSigninClient : GoogleSignInClient? = null
     var GOOGLE_LOGIN_CODE = 1
     var callbackManager : CallbackManager? = null
+    val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(binding.root)
         auth = FirebaseAuth.getInstance()
 
+
         //이메일, 구글, 페이스북 로그인 버튼 이벤트
-        email_login_button.setOnClickListener {
+        binding.emailLoginButton.setOnClickListener {
             signinAndSignup()
         }
-        google_signin_button.setOnClickListener {
+        binding.googleSigninButton.setOnClickListener {
             googleLogin()
         }
-        facebook_signin_button.setOnClickListener {
+        binding.facebookSigninButton.setOnClickListener {
             facebookLogin()
         }
         // 구글 로그인
@@ -126,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun signinAndSignup(){
-        auth?.createUserWithEmailAndPassword(email_edittext.text.toString(), password_edittext.text.toString())
+        auth?.createUserWithEmailAndPassword(binding.emailEdittext.text.toString(), binding.passwordEdittext.text.toString())
             ?.addOnCompleteListener {
             task ->
                 if(task.isSuccessful){
@@ -141,7 +144,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
     fun signinEmail(){
-        auth?.createUserWithEmailAndPassword(email_edittext.text.toString(), password_edittext.text.toString())?.addOnCompleteListener {
+        auth?.createUserWithEmailAndPassword(binding.emailEdittext.text.toString(), binding.passwordEdittext.text.toString())?.addOnCompleteListener {
                 task ->
             if(task.isSuccessful){
                 moveMainPage(task.result?.user)
