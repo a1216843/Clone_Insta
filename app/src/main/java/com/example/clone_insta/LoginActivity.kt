@@ -1,6 +1,7 @@
 package com.example.clone_insta
 
 import android.content.Intent
+import android.icu.util.TimeUnit.values
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import java.time.chrono.JapaneseEra.values
 import java.util.*
 
 
@@ -135,16 +137,13 @@ class LoginActivity : AppCompatActivity() {
                 if(task.isSuccessful){
                     //Creating a user account
                     moveMainPage(task.result?.user)
-                }else if(task.exception?.message.isNullOrEmpty()){
-                    //Show the error message
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_LONG).show()
                 }else{
                     signinEmail()
                 }
         }
     }
     fun signinEmail(){
-        auth?.createUserWithEmailAndPassword(binding.emailEdittext.text.toString(), binding.passwordEdittext.text.toString())?.addOnCompleteListener {
+        auth?.signInWithEmailAndPassword(binding.emailEdittext.text.toString(), binding.passwordEdittext.text.toString())?.addOnCompleteListener {
                 task ->
             if(task.isSuccessful){
                 moveMainPage(task.result?.user)
