@@ -14,16 +14,19 @@ import com.example.clone_insta.R
 import com.example.clone_insta.databinding.FragmentDetailBinding
 import com.example.clone_insta.databinding.ItemDetailBinding
 import com.example.clone_insta.navigation.model.ContentDTO
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class DetailViewFragment : Fragment() {
     lateinit var binding: FragmentDetailBinding
     var firestore : FirebaseFirestore? = null
+    var uid : String? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // LayoutInflater는 XML 리소스를 View로 반환하는 역할을 함 주로 사용하는 onCreate의 setContentView도 이러한 Inflater의 역할을 내부적으로 수행한다.
         // inflate(View 객체로 만들 XML, 객체화 된 View를 담을 레이아웃 or 컨테이너, 바로 인플레이션 할 것인지 여부)
         binding = FragmentDetailBinding.inflate(inflater, container, false)
         firestore = FirebaseFirestore.getInstance()
+        uid = FirebaseAuth.getInstance().currentUser?.uid
 
         binding.detailviewfragmentRecyclerview.adapter = DetailViewRecyclerViewAdapter()
         binding.detailviewfragmentRecyclerview.layoutManager = LinearLayoutManager(activity)
@@ -61,7 +64,7 @@ class DetailViewFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val viewholder = (holder as CustomViewHolder).itemView
+            holder as CustomViewHolder
 
             System.out.println("테스트 출력:"+contentDTOs[0].userId)
 
@@ -74,6 +77,35 @@ class DetailViewFragment : Fragment() {
             holder.binding.detailviewitemFavoritecounterTextview.text = "Likes" + contentDTOs!![position].favoriteCount
 
             Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(holder.binding.detailviewitemProfileImage)
+
+            //button event
+            holder.binding.detailviewitemFavoriteImageview.setOnClickListener {
+                favoriteEvent(position)
+                if(contentDTOs!![position].favorites.containsKey(uid)){
+                    // like status
+                    holder.binding.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite_border)
+                }
+                else{
+                    holder.binding.detailviewitemFavoriteImageview.setImageResource(R.drawable.ic_favorite)
+                }
+            }
+        }
+
+        fun favoriteEvent(position: Int){
+            var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
+            firestore?.runTransaction { transaction ->
+                var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
+
+                if(contentDTO!!.favorites.containsKey(uid)){
+                    contentDTO?.favoriteCount = contentDTO?.favoriteCount - 1
+                    contentDTO?.favorites.remove(uid)
+                }
+                else{
+                    contentDTO?.favoriteCount = contentDTO?.favoriteCount + 1
+                    contentDTO?.favorites[uid!!] = true
+                }
+                transaction.set(tsDoc, contentDTO)
+            }
         }
 
 
