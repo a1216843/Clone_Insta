@@ -1,5 +1,6 @@
 package com.example.clone_insta.navigation
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.clone_insta.LoginActivity
+import com.example.clone_insta.MainActivity
 import com.example.clone_insta.R
 import com.example.clone_insta.databinding.FragmentUserBinding
 import com.example.clone_insta.navigation.model.ContentDTO
@@ -23,6 +26,7 @@ class UserFragment : Fragment() {
     var firestore : FirebaseFirestore? = null
     var uid : String? = null
     var auth : FirebaseAuth? = null
+    var currentUserUid : String? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // LayoutInflater는 XML 리소스를 View로 반환하는 역할을 함 주로 사용하는 onCreate의 setContentView도 이러한 Inflater의 역할을 내부적으로 수행한다.
         // inflate(View 객체로 만들 XML, 객체화 된 View를 담을 레이아웃 or 컨테이너, 바로 인플레이션 할 것인지 여부)
@@ -30,6 +34,29 @@ class UserFragment : Fragment() {
         uid = arguments?.getString("destinationUid")
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        currentUserUid = auth?.currentUser?.uid
+
+        if(uid == currentUserUid){
+            //MyPage
+            binding.accountBtnFollowSignout?.text = getString(R.string.signout)
+            binding.accountBtnFollowSignout?.setOnClickListener {
+                activity?.finish()
+                startActivity(Intent(activity, LoginActivity::class.java))
+                auth?.signOut()
+            }
+        }
+        else{
+            //Other UserPage
+            binding.accountBtnFollowSignout?.text = getString(R.string.follow)
+            var mainactivity = (activity as MainActivity)
+            mainactivity?.binding.toolbarUsername?.text = arguments?.getString("userId")
+            mainactivity?.binding.toolbarBtnBack?.setOnClickListener {
+                mainactivity.binding.bottomNavigation.selectedItemId = R.id.action_home
+            }
+            mainactivity?.binding.toolbarTitleImage?.visibility = View.GONE
+            mainactivity?.binding.toolbarUsername?.visibility = View.VISIBLE
+            mainactivity?.binding.toolbarBtnBack?.visibility = View.VISIBLE
+        }
 
         binding.accountRecyclerview.adapter = UserFragmentRecyclerViewAdapter()
         binding.accountRecyclerview.layoutManager = GridLayoutManager(activity, 3)
