@@ -1,6 +1,7 @@
 package com.example.clone_insta.navigation
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Layout
 import android.view.LayoutInflater
@@ -98,6 +99,12 @@ class DetailViewFragment : Fragment() {
                 bundle.putString("userId", contentDTOs[position].userId)
                 fragment.arguments = bundle
                 activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content, fragment)?.commit()
+            }
+
+            holder.binding.detailviewitemCommentImageview.setOnClickListener {
+                var intent = Intent(activity, CommentActivity::class.java)
+                intent.putExtra("contentUid", contentUidList[position])
+                startActivity(intent)
             }
         }
 
