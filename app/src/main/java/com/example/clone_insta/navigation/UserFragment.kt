@@ -19,6 +19,7 @@ import com.example.clone_insta.LoginActivity
 import com.example.clone_insta.MainActivity
 import com.example.clone_insta.R
 import com.example.clone_insta.databinding.FragmentUserBinding
+import com.example.clone_insta.navigation.model.AlarmDTO
 import com.example.clone_insta.navigation.model.ContentDTO
 import com.example.clone_insta.navigation.model.FollowDTO
 import com.google.firebase.auth.FirebaseAuth
@@ -136,7 +137,7 @@ class UserFragment : Fragment() {
                 followDTO = FollowDTO()
                 followDTO!!.followerCount = 1
                 followDTO!!.followers[currentUserUid!!] = true
-
+                followerAlarm(uid!!)
                 transaction.set(tsDocFollower, followDTO!!)
                 return@runTransaction
             }
@@ -150,10 +151,20 @@ class UserFragment : Fragment() {
                 //It add my follower when I don't follow a third person
                 followDTO!!.followerCount = followDTO!!.followerCount + 1
                 followDTO!!.followers[currentUserUid!!] = true
+                followerAlarm(uid!!)
             }
             transaction.set(tsDocFollower, followDTO!!)
             return@runTransaction
         }
+    }
+    fun followerAlarm(destinationUid : String){
+        var alarmDTO = AlarmDTO()
+        alarmDTO.destinationUid = destinationUid
+        alarmDTO.userId = auth?.currentUser?.email
+        alarmDTO.uid = auth?.currentUser?.uid
+        alarmDTO.kind = 2
+        alarmDTO.timestamp = System.currentTimeMillis()
+        FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
     }
     fun getProfileImage(){
         // 내가 아닌 다른 사용자의 Userpage에서 프로필 사진 클릭하면 크래시 생김
