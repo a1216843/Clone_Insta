@@ -12,11 +12,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.clone_insta.databinding.ActivityMainBinding
 import com.example.clone_insta.navigation.*
+import com.example.clone_insta.navigation.util.FcmPush
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.util.jar.Manifest
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.bottomNavigation.setOnNavigationItemSelectedListener(this)
+        registerPushToken()
         ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1)
     }
 
@@ -75,6 +78,22 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         binding.toolbarUsername.visibility = View.GONE
         binding.toolbarBtnBack.visibility = View.GONE
         binding.toolbarTitleImage.visibility = View.VISIBLE
+    }
+    fun registerPushToken(){
+        FirebaseInstanceId.getInstance().instanceId.addOnCompleteListener {
+            task ->
+            val token = task.result?.token
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            val map = mutableMapOf<String, Any>()
+            map["pushToken"] = token!!
+
+            FirebaseFirestore.getInstance().collection("pushtokens").document(uid!!).set(map)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        FcmPush.instance.sendMessage("AwPd63dXQXbypbc4uQm42dlNPNn2", "hi", "test")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
