@@ -16,6 +16,7 @@ import com.example.clone_insta.databinding.FragmentDetailBinding
 import com.example.clone_insta.databinding.ItemDetailBinding
 import com.example.clone_insta.navigation.model.AlarmDTO
 import com.example.clone_insta.navigation.model.ContentDTO
+import com.example.clone_insta.navigation.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -135,6 +136,9 @@ class DetailViewFragment : Fragment() {
             alarmDTO.kind = 0
             alarmDTO.timestamp = System.currentTimeMillis()
             FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+
+            var message = FirebaseAuth.getInstance().currentUser?.email + " " + getString(R.string.alarm_favorite)
+            FcmPush.instance.sendMessage(destinationUid, "Clone_insta", message)
         }
     }
 }

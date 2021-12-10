@@ -15,6 +15,7 @@ import com.example.clone_insta.databinding.ActivityCommentBinding
 import com.example.clone_insta.databinding.ItemCommentBinding
 import com.example.clone_insta.navigation.model.AlarmDTO
 import com.example.clone_insta.navigation.model.ContentDTO
+import com.example.clone_insta.navigation.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -52,6 +53,10 @@ class CommentActivity : AppCompatActivity() {
         alarmDTO.timestamp = System.currentTimeMillis()
         alarmDTO.message = message
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+
+        var comment = FirebaseAuth.getInstance().currentUser?.email +" "+ getString(R.string.alarm_comment) + " of " + message
+        FcmPush.instance.sendMessage(destinationUid, "Clone_insta", comment)
+
     }
     inner class CommentRecyclerviewAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         var comments : ArrayList<ContentDTO.Comment> = arrayListOf()

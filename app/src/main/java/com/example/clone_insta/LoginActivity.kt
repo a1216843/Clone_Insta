@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -52,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
         }
         // 구글 로그인
         var gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestIdToken("246967096860-enl2spvcejvlekbknflu4cj9oo00fbc7.apps.googleusercontent.com")
             .requestEmail()
             .build()
         // 구글 로그인 클라이언트 객체
@@ -112,10 +113,13 @@ class LoginActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         callbackManager?.onActivityResult(requestCode, resultCode, data)
         if(requestCode == GOOGLE_LOGIN_CODE){
-            var result = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
-            if(result.isSuccess){
-                var account = result.signInAccount
+            var task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account)
+            } catch (e : ApiException){
+                println("Sign in Failed")
+                println(e)
             }
         }
     }
@@ -123,10 +127,10 @@ class LoginActivity : AppCompatActivity() {
     fun firebaseAuthWithGoogle(account : GoogleSignInAccount?){
         var credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         auth?.signInWithCredential(credential)
-            ?.addOnCompleteListener {
-                    task ->
+            ?.addOnCompleteListener { task ->
                 if(task.isSuccessful){
                     //Creating a user account
+                    System.out.println("페이지 이동 호출")
                     moveMainPage(task.result?.user)
                 }else{
                     //Show the error message
@@ -159,6 +163,7 @@ class LoginActivity : AppCompatActivity() {
     }
     fun moveMainPage(user:FirebaseUser?){
         if(user != null){
+            System.out.println("페이지 이동")
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }

@@ -91,11 +91,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        FcmPush.instance.sendMessage("AwPd63dXQXbypbc4uQm42dlNPNn2", "hi", "test")
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

@@ -22,6 +22,7 @@ import com.example.clone_insta.databinding.FragmentUserBinding
 import com.example.clone_insta.navigation.model.AlarmDTO
 import com.example.clone_insta.navigation.model.ContentDTO
 import com.example.clone_insta.navigation.model.FollowDTO
+import com.example.clone_insta.navigation.util.FcmPush
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -165,6 +166,9 @@ class UserFragment : Fragment() {
         alarmDTO.kind = 2
         alarmDTO.timestamp = System.currentTimeMillis()
         FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
+
+        var message = FirebaseAuth.getInstance().currentUser?.email + " " + getString(R.string.alarm_follow)
+        FcmPush.instance.sendMessage(destinationUid, "Clone_insta", message)
     }
     fun getProfileImage(){
         // 내가 아닌 다른 사용자의 Userpage에서 프로필 사진 클릭하면 크래시 생김

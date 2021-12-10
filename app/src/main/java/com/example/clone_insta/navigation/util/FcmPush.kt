@@ -47,6 +47,7 @@ class FcmPush {
                     }
 
                     override fun onResponse(response: Response?) {
+                        println("푸시 메시지 전송")
                         println(response?.body()?.string())
                     }
 
